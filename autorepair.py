@@ -130,10 +130,6 @@ def mission(client):
     else:
         print("遠征中")
 
-def mission_clear(client):
-    mission_result = client.call('/api_req_mission/result')
-    print(mission_result)
-
 def fetch_master():
     #ship = client.call('/api_get_master/ship')
     return None
