@@ -79,6 +79,7 @@ def find_repairable(member, decks, docks):
         return ship
     return None
 
+# 対象の艦が補給対象となるかどうか
 def can_supply(ship, master):
     ship_master = master.get_ship(ship['api_ship_id'])
     if ship_master['api_fuel_max'] > ship['api_fuel']:
@@ -128,7 +129,7 @@ def mission(client):
         print(mission_result)
         supply(client)
     else:
-        print("遠征中")
+        print("遠征中:" + str(dai2kantai['api_mission'][2]))
 
 def fetch_master():
     #ship = client.call('/api_get_master/ship')
@@ -145,11 +146,15 @@ def supply(client):
 
     for ship_id in ship_ids:
         result = client.call('/api_req_hokyu/charge', {'api_kind': 3, 'api_id_items': ship_id})
-        print(result)
+        if result['api_result'] != 1:
+            print(result)
+        print("補給完了:" + str(result['api_data']['api_ship'][0]['api_id']))
+        print(result['api_data']['api_material'])
         time.sleep(3)
 
 def battle(client):
-    result = client.call('/api_req_map/start', {'api_formation_id': '1', 'api_deck_id': '1', 'api_maparea_id': '1', 'api_mapinfo_no': '1'})
+    result = client.call('/api_req_map/start',
+                         {'api_formation_id': '1', 'api_deck_id': '1', 'api_maparea_id': '1', 'api_mapinfo_no': '1'})
     print(result)
     time.sleep(5)
 
@@ -162,6 +167,7 @@ def battle(client):
     time.sleep(5)
 
     supply(client)
+
 def main():
     client = Client(sys.argv[1])
     while True:
