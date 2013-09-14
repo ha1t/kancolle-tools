@@ -113,14 +113,14 @@ def repair(client):
                  'api_ndock_id': dock_no,
                  'api_highspeed': 0})
 
-def mission(client):
+def mission(client, port_number, misson_id):
     deck_port = client.call('/api_get_member/deck_port')
-    dai2kantai = deck_port['api_data'][1]
+    dai2kantai = deck_port['api_data'][port_number]
     if dai2kantai['api_mission'][2] == 0:
         print("出撃可能")
         try:
             result = client.call('/api_req_mission/start',
-                                 {'api_deck_id': dai2kantai['api_id'], 'api_mission_id': '5'})
+                                 {'api_deck_id': dai2kantai['api_id'], 'api_mission_id': misson_id})
             print(result)
         except:
             print('出撃')
@@ -129,7 +129,7 @@ def mission(client):
         print(mission_result)
         supply(client)
     else:
-        print("遠征中:" + str(dai2kantai['api_mission'][2]))
+        print("遠征中:" + str(dai2kantai['api_mission'][2] - (int(time.time()) * 1000)))
 
 def fetch_master():
     #ship = client.call('/api_get_master/ship')
@@ -148,8 +148,7 @@ def supply(client):
         result = client.call('/api_req_hokyu/charge', {'api_kind': 3, 'api_id_items': ship_id})
         if result['api_result'] != 1:
             print(result)
-        print("補給完了:" + str(result['api_data']['api_ship'][0]['api_id']))
-        print(result['api_data']['api_material'])
+        print("補給完了:" + str(result['api_data']['api_ship'][0]['api_id']) + " " + str(result['api_data']['api_material']))
         time.sleep(3)
 
 def battle(client):
@@ -171,16 +170,26 @@ def battle(client):
 def main():
     client = Client(sys.argv[1])
     while True:
-        #battle(client)
-        #battle(client)
-        #battle(client)
-        #battle(client)
-        #battle(client)
+        sleep_time = 234
 
-        repair(client)
-        supply(client)
-        mission(client)
-        time.sleep(234)
+        battle(client)
+        battle(client)
+        battle(client)
+        battle(client)
+        battle(client)
+
+        battle(client)
+        battle(client)
+        battle(client)
+        battle(client)
+        battle(client)
+        sys.exit()
+
+        #repair(client)
+        #supply(client)
+        #mission(client, 1, '5')
+        #mission(client, 2, '3')
+        time.sleep(sleep_time)
 
 # https://gist.github.com/oh-sky/6404680/raw/04761c89fe63d5935a3102e900bf5812d1a3b158/knkr.rb
 # http://www.kirishikistudios.com/?p=154
