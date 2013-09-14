@@ -3,9 +3,8 @@ from __future__ import print_function
 
 import sys
 import random
-import requests
-import json
 import time
+from client import Client
 
 class NotExpectedResult(Exception):
     pass
@@ -23,40 +22,11 @@ class Master(object):
                 return ship
         raise NotExpectedResult(ship_id)
 
-class Client(object):
-    #prefix = 'http://203.104.105.167/kcsapi'
-    prefix = 'http://203.104.248.135/kcsapi'
-
-    def __init__(self, token):
-        self.session = requests.session()
-        self.session.headers.update({
-            'Uesr-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/27.0.1453.116 Safari/537.36',
-            'Origin': 'http://203.104.105.167',
-            'Referer': 'http://203.104.105.167/kcs/port.swf?version=1.3.9',})
-        self.base_data = {'api_verno': 1, 'api_token': token}
-
-    def call(self, path, data=None):
-        if data is None:
-            data = {}
-        data.update(self.base_data)
-        res = self.session.post(self.prefix + path, data)
-        res.raise_for_status()
-        resdata = res.text
-        if not resdata.startswith('svdata='):
-            return None
-            raise NotExpectedResult(resdata)
-        resjson = json.loads(resdata[7:])
-        if resjson['api_result'] != 1:
-            raise NotExpectedResult(resdata)
-        return resjson
-
-
 def find_free_dock(docks):
     for d in docks:
         if d['api_state'] == 0:
             return d['api_id']
     return None
-
 
 def find_repairable(member, decks, docks):
     u"""入渠する艦を選んでその ship を返す."""
@@ -154,11 +124,12 @@ def supply(client):
 def battle(client):
     result = client.call('/api_req_map/start',
                          {'api_formation_id': '1', 'api_deck_id': '1', 'api_maparea_id': '1', 'api_mapinfo_no': '1'})
-    print(result)
+    print(result['api_data'])
     time.sleep(5)
 
     result = client.call('/api_req_sortie/battle', {'api_formation': '1'})
-    print(result)
+    print(result['api_data']['api_maxhps'])
+    print(result['api_data']['api_nowhps'])
     time.sleep(5)
 
     result = client.call('/api_req_sortie/battleresult')
@@ -172,23 +143,17 @@ def main():
     while True:
         sleep_time = 234
 
-        battle(client)
-        battle(client)
-        battle(client)
-        battle(client)
-        battle(client)
+        #battle(client)
+        #battle(client)
+        #battle(client)
+        #battle(client)
+        #battle(client)
+        #sys.exit()
 
-        battle(client)
-        battle(client)
-        battle(client)
-        battle(client)
-        battle(client)
-        sys.exit()
-
-        #repair(client)
-        #supply(client)
-        #mission(client, 1, '5')
-        #mission(client, 2, '3')
+        repair(client)
+        supply(client)
+        mission(client, 1, '5')
+        mission(client, 2, '3')
         time.sleep(sleep_time)
 
 # https://gist.github.com/oh-sky/6404680/raw/04761c89fe63d5935a3102e900bf5812d1a3b158/knkr.rb
