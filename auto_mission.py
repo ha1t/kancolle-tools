@@ -1,6 +1,7 @@
 # coding: utf-8
 from __future__ import print_function
 
+import os
 import sys
 import random
 import time
@@ -33,8 +34,8 @@ def find_repairable(member, decks, docks):
     cant_repair = set()
 
     # 編成されてる艦を入渠するとバレるのでしない.
-    #for deck in decks:
-        #cant_repair.update(deck['api_ship'])
+    for deck in decks:
+        cant_repair.update(deck['api_ship'])
 
     # 修理中の艦ももちろん入渠しない.
     for dock in docks:
@@ -121,10 +122,21 @@ def supply(client):
         print("補給完了:" + str(result['api_data']['api_ship'][0]['api_id']) + " " + str(result['api_data']['api_material']))
         time.sleep(3)
 
-def battle(client):
+def battle(client, deck_id = '1'):
+    #mapinfo_no = '3'
+    #maparea_id = '2'
+
+    mapinfo_no = '1'
+    maparea_id = '1'
     result = client.call('/api_req_map/start',
-                         {'api_formation_id': '1', 'api_deck_id': '1', 'api_maparea_id': '1', 'api_mapinfo_no': '1'})
+                         {'api_formation_id': '1', 'api_deck_id': deck_id, 'api_maparea_id': maparea_id, 'api_mapinfo_no': mapinfo_no})
+    print(str(result['api_data']['api_mapinfo_no']) + "-" + str(result['api_data']['api_maparea_id']))
     print(result['api_data'])
+
+    if result['api_data'].has_key('api_itemget'):
+        print("アイテムゲット！")
+        result = client.call('/api_req_map/next')
+        print(result)
     time.sleep(5)
 
     result = client.call('/api_req_sortie/battle', {'api_formation': '1'})
@@ -133,22 +145,29 @@ def battle(client):
     time.sleep(5)
 
     result = client.call('/api_req_sortie/battleresult')
-    print(result)
-    time.sleep(5)
+    print('---')
+    print(result['api_data']['api_get_ship_exp'])
+    print(result['api_data']['api_get_exp_lvup'])
+    print('---')
 
     supply(client)
+    time.sleep(5)
+
+    if result['api_data']['api_get_ship_exp'][1] != 108:
+        print('異常発生。巡回を停止します')
+        os.system('nma.sh "艦これ" auto ' + time.strftime("%H-%M-%S"))
+        sys.exit()
 
 def main():
     client = Client(sys.argv[1])
     while True:
-        sleep_time = 234
+        sleep_time = 200
 
         #battle(client)
         #battle(client)
         #battle(client)
         #battle(client)
         #battle(client)
-        #sys.exit()
 
         repair(client)
         supply(client)
