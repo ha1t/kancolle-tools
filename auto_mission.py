@@ -88,19 +88,16 @@ def mission(client, port_number, misson_id):
     deck_port = client.call('/api_get_member/deck_port')
     dai2kantai = deck_port['api_data'][port_number]
     if dai2kantai['api_mission'][2] == 0:
-        print("出撃可能")
-        try:
-            result = client.call('/api_req_mission/start',
-                                 {'api_deck_id': dai2kantai['api_id'], 'api_mission_id': misson_id})
-            print(result)
-        except:
-            print('出撃')
+        result = client.call('/api_req_mission/start',
+                             {'api_deck_id': dai2kantai['api_id'], 'api_mission_id': misson_id})
+        print("出撃")
     elif dai2kantai['api_mission'][2] < (int(time.time()) * 1000):
         mission_result = client.call('/api_req_mission/result', {'api_deck_id': dai2kantai['api_id']})
         print(mission_result)
         supply(client)
     else:
-        print("遠征中:" + str(dai2kantai['api_mission'][2] - (int(time.time()) * 1000)))
+        nokori = int(str(dai2kantai['api_mission'][2])[0:-3])
+        print("遠征中:" + str(port_number) + "/" + str(nokori - int(time.time())))
 
 def fetch_master():
     #ship = client.call('/api_get_master/ship')
