@@ -123,6 +123,9 @@ def battle(client, deck_id = '1'):
     #mapinfo_no = '3'
     #maparea_id = '2'
 
+    if is_max(client):
+        destroy_old_ship(client)
+
     mapinfo_no = '1'
     maparea_id = '1'
     result = client.call('/api_req_map/start',
@@ -155,15 +158,39 @@ def battle(client, deck_id = '1'):
         os.system('nma.sh "艦これ" auto ' + time.strftime("%H-%M-%S"))
         sys.exit()
 
+def powerup(client, ship_id, id_items):
+    result = client.call('/api_req_kaisou/powerup',
+                        {'api_id_items': id_items, 'api_id': ship_id})
+
+def destroy_ship(client, ship_id):
+    result = client.call('/api_req_kousyou/destroyship', {'api_ship_id': ship_id})
+
+def destroy_old_ship(client):
+    master = Master()
+    result = client.call('/api_get_member/ship2',
+                        {'api_sort_order': 2, 'api_sort_key': 1})
+    for ship in result['api_data']:
+        ship_master = master.get_ship(ship['api_ship_id'])
+        if ship['api_lv'] == 1:
+            if ship_master['api_powup'] == [0, 1, 0, 0]:
+                print(u"解体: " + ship_master['api_name'] + " / " + str(ship['api_id']))
+                destroy_ship(client, ship['api_id'])
+                time.sleep(3)
+
+
+def is_max(client):
+    result = client.call('/api_get_member/record')
+    if result['api_data']['api_ship'][1] == result['api_data']['api_ship'][0]:
+        return True
+    return False
+
 def main():
     client = Client(sys.argv[1])
+    #destroy_old_ship(client)
+    #sys.exit()
     while True:
         sleep_time = 200
 
-        #battle(client)
-        #battle(client)
-        #battle(client)
-        #battle(client)
         #battle(client)
 
         repair(client)
