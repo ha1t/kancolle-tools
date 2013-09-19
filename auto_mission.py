@@ -77,12 +77,13 @@ def repair(client):
     if ship is None:
         return
 
-    print('dock_no=', dock_no, ' ship=', ship)
-
     client.call('/api_req_nyukyo/start',
                 {'api_ship_id': ship['api_id'],
                  'api_ndock_id': dock_no,
                  'api_highspeed': 0})
+
+    print('dock_no=', dock_no, ' ship=', ship)
+
 
 def mission(client, port_number, misson_id):
     deck_port = client.call('/api_get_member/deck_port')
@@ -97,7 +98,7 @@ def mission(client, port_number, misson_id):
         supply(client)
     else:
         nokori = int(str(dai2kantai['api_mission'][2])[0:-3])
-        print("遠征中:" + str(port_number) + "/" + str(nokori - int(time.time())))
+        print("遠征中:" + str(port_number) + " / 残り" + str(nokori - int(time.time())) + "秒")
 
 def fetch_master():
     #ship = client.call('/api_get_master/ship')
@@ -123,8 +124,10 @@ def battle(client, deck_id = '1'):
     #mapinfo_no = '3'
     #maparea_id = '2'
 
-    if is_max(client):
+    if is_full(client):
         destroy_old_ship(client)
+        if is_full(client):
+            print("所持数が限界に到達しました")
 
     mapinfo_no = '1'
     maparea_id = '1'
@@ -153,7 +156,7 @@ def battle(client, deck_id = '1'):
     supply(client)
     time.sleep(5)
 
-    if result['api_data']['api_get_ship_exp'][1] != 108:
+    if result['api_data']['api_get_ship_exp'][1] not in [108, 90]:
         print('異常発生。巡回を停止します')
         os.system('nma.sh "艦これ" auto ' + time.strftime("%H-%M-%S"))
         sys.exit()
@@ -172,35 +175,96 @@ def destroy_old_ship(client):
     for ship in result['api_data']:
         ship_master = master.get_ship(ship['api_ship_id'])
         if ship['api_lv'] == 1:
+            #if ship_master['api_powup'] == [0, 1, 0, 1]:
+            #    print(u"解体: " + ship_master['api_name'] + " / " + str(ship['api_id']))
+            #    destroy_ship(client, ship['api_id'])
+            #    time.sleep(3)
             if ship_master['api_powup'] == [0, 1, 0, 0]:
                 print(u"解体: " + ship_master['api_name'] + " / " + str(ship['api_id']))
                 destroy_ship(client, ship['api_id'])
                 time.sleep(3)
 
 
-def is_max(client):
+def is_full(client):
     result = client.call('/api_get_member/record')
     if result['api_data']['api_ship'][1] == result['api_data']['api_ship'][0]:
         return True
     return False
 
+def engage_next_ship(client):
+    # 対象のshipが全回復状態か
+    ship_ids = [92, 187, 240]
+
+    # 対象のshipが編成済みかどうか
+    in_deck_ships = []
+    decks = client.call('/api_get_member/deck')
+    deck = decks['api_data'][0]
+    for in_deck_ship_id in deck['api_ship']:
+        if in_deck_ship_id > -1:
+            in_deck_ships.append(in_deck_ship_id)
+
+    # 対象のshipが修復中かどうか
+    repair_ships = []
+    ndock = client.call('/api_get_member/ndock')
+    for row in ndock['api_data']:
+        repair_ships.append(row['api_ship_id'])
+
+    target_ship_id = -1
+    for ship_id in ship_ids:
+        if ship_id in in_deck_ships:
+                continue
+        if ship_id in repair_ships:
+                continue
+        target_ship_id = ship_id
+
+    result = client.call('/api_req_hensei/change',
+                         {'api_ship_id': target_ship_id, 'api_ship_idx': '0', 'api_id': '1'})
+    print(result)
+    sys.exit()
+
+class AutoTool(object):
+
+    def __init__(self, token):
+        self.client = Client(token)
+        self.master = Master()
+
+        print('initialize...')
+        #self.ship2 = client.call('/api_get_member/ship2',
+        #                         {'api_sort_order': 2, 'api_sort_key': 1})
+
+    def crawl(self):
+        #engage_next_ship(self.client)
+        #sys.exit()
+        while True:
+            sleep_time = 240
+
+            battle(self.client)
+            battle(self.client)
+            battle(self.client)
+            battle(self.client)
+            battle(self.client)
+
+            battle(self.client)
+            battle(self.client)
+            battle(self.client)
+            battle(self.client)
+            battle(self.client)
+
+            repair(self.client)
+            supply(self.client)
+            mission(self.client, 1, '5')
+            mission(self.client, 2, '3')
+            time.sleep(sleep_time)
+
 def main():
-    client = Client(sys.argv[1])
+    auto_tool = AutoTool(sys.argv[1])
+    auto_tool.crawl()
+    sys.exit()
+
+    #client = Client(sys.argv[1])
+    #engage_next_ship(client)
     #destroy_old_ship(client)
     #sys.exit()
-    while True:
-        sleep_time = 200
-
-        #battle(client)
-
-        repair(client)
-        supply(client)
-        mission(client, 1, '5')
-        mission(client, 2, '3')
-        time.sleep(sleep_time)
-
-# https://gist.github.com/oh-sky/6404680/raw/04761c89fe63d5935a3102e900bf5812d1a3b158/knkr.rb
-# http://www.kirishikistudios.com/?p=154
 
 if __name__ == '__main__':
     main()
