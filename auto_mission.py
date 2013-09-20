@@ -91,7 +91,7 @@ def mission(client, port_number, mission_id):
         mission_start(client, dai2kantai['api_id'], mission_id)
     elif dai2kantai['api_mission'][2] < (int(time.time()) * 1000):
         mission_result = client.call('/api_req_mission/result', {'api_deck_id': dai2kantai['api_id']})
-        print("遠征遠征から帰投しました")
+        print("遠征から帰投しました")
         supply(client)
         mission_start(client, dai2kantai['api_id'], mission_id)
     else:
