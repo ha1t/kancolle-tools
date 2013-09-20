@@ -84,21 +84,24 @@ def repair(client):
 
     print('dock_no=', dock_no, ' ship=', ship)
 
-
 def mission(client, port_number, misson_id):
     deck_port = client.call('/api_get_member/deck_port')
     dai2kantai = deck_port['api_data'][port_number]
     if dai2kantai['api_mission'][2] == 0:
-        result = client.call('/api_req_mission/start',
-                             {'api_deck_id': dai2kantai['api_id'], 'api_mission_id': misson_id})
-        print("遠征開始！")
+        mission_start(client, dai2kantai['api_id'], mission_id)
     elif dai2kantai['api_mission'][2] < (int(time.time()) * 1000):
         mission_result = client.call('/api_req_mission/result', {'api_deck_id': dai2kantai['api_id']})
-        print(mission_result)
+        print("遠征遠征から帰投しました")
         supply(client)
+        mission_start(client, dai2kantai['api_id'], mission_id)
     else:
         nokori = int(str(dai2kantai['api_mission'][2])[0:-3])
         print("遠征中:" + str(port_number) + " / 残り" + str(nokori - int(time.time())) + "秒")
+
+def mission_start(client, api_deck_id, api_mission_id):
+    result = client.call('/api_req_mission/start',
+                         {'api_deck_id': api_deck_id, 'api_mission_id': api_misson_id})
+    print("遠征開始！")
 
 def fetch_master():
     #ship = client.call('/api_get_master/ship')
@@ -175,10 +178,6 @@ def destroy_old_ship(client):
     for ship in result['api_data']:
         ship_master = master.get_ship(ship['api_ship_id'])
         if ship['api_lv'] == 1:
-            #if ship_master['api_powup'] == [0, 1, 0, 1]:
-            #    print(u"解体: " + ship_master['api_name'] + " / " + str(ship['api_id']))
-            #    destroy_ship(client, ship['api_id'])
-            #    time.sleep(3)
             if ship_master['api_powup'] == [0, 1, 0, 0]:
                 print(u"解体: " + ship_master['api_name'] + " / " + str(ship['api_id']))
                 destroy_ship(client, ship['api_id'])
@@ -233,22 +232,13 @@ class AutoTool(object):
         #                         {'api_sort_order': 2, 'api_sort_key': 1})
 
     def crawl(self):
+        #destroy_old_ship(self.client)
         #engage_next_ship(self.client)
         #sys.exit()
         while True:
             sleep_time = 240
 
-            battle(self.client)
-            battle(self.client)
-            battle(self.client)
-            battle(self.client)
-            battle(self.client)
-
-            battle(self.client)
-            battle(self.client)
-            battle(self.client)
-            battle(self.client)
-            battle(self.client)
+            #battle(self.client)
 
             repair(self.client)
             supply(self.client)
