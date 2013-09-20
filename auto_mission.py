@@ -251,10 +251,5 @@ def main():
     auto_tool.crawl()
     sys.exit()
 
-    #client = Client(sys.argv[1])
-    #engage_next_ship(client)
-    #destroy_old_ship(client)
-    #sys.exit()
-
 if __name__ == '__main__':
     main()
