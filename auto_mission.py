@@ -84,7 +84,7 @@ def repair(client):
 
     print('dock_no=', dock_no, ' ship=', ship)
 
-def mission(client, port_number, misson_id):
+def mission(client, port_number, mission_id):
     deck_port = client.call('/api_get_member/deck_port')
     dai2kantai = deck_port['api_data'][port_number]
     if dai2kantai['api_mission'][2] == 0:
@@ -100,7 +100,7 @@ def mission(client, port_number, misson_id):
 
 def mission_start(client, api_deck_id, api_mission_id):
     result = client.call('/api_req_mission/start',
-                         {'api_deck_id': api_deck_id, 'api_mission_id': api_misson_id})
+                         {'api_deck_id': api_deck_id, 'api_mission_id': api_mission_id})
     print("遠征開始！")
 
 def fetch_master():
