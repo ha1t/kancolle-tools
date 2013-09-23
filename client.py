@@ -7,7 +7,7 @@ import requests
 class Client(object):
     #prefix = 'http://203.104.105.167/kcsapi'
     prefix = 'http://203.104.248.135/kcsapi'
-    version = '1.4.0'
+    version = '1.4.2'
 
     def __init__(self, token):
         self.session = requests.session()
