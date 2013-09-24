@@ -124,16 +124,16 @@ def supply(client):
         time.sleep(3)
 
 def battle(client, deck_id = '1'):
-    #mapinfo_no = '3'
-    #maparea_id = '2'
+
+    # mapinfo_no - maparea_id
+    mapinfo_no = '1'
+    maparea_id = '1'
 
     if is_full(client):
         destroy_old_ship(client)
         if is_full(client):
             print("所持数が限界に到達しました")
 
-    mapinfo_no = '1'
-    maparea_id = '1'
     result = client.call('/api_req_map/start',
                          {'api_formation_id': '1', 'api_deck_id': deck_id, 'api_maparea_id': maparea_id, 'api_mapinfo_no': mapinfo_no})
     print(str(result['api_data']['api_mapinfo_no']) + "-" + str(result['api_data']['api_maparea_id']))
@@ -238,12 +238,23 @@ class AutoTool(object):
         while True:
             sleep_time = 240
 
-            #battle(self.client)
+            battle(self.client)
+            battle(self.client)
+            battle(self.client)
+            battle(self.client)
+            battle(self.client)
+
+            battle(self.client)
+            battle(self.client)
+            battle(self.client)
+            battle(self.client)
+            battle(self.client)
 
             repair(self.client)
             supply(self.client)
             mission(self.client, 1, '5')
-            mission(self.client, 2, '3')
+            mission(self.client, 2, '6')
+            mission(self.client, 3, '9')
             time.sleep(sleep_time)
 
 def main():
