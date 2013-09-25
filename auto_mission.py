@@ -103,10 +103,12 @@ def mission_start(client, api_deck_id, api_mission_id):
                          {'api_deck_id': api_deck_id, 'api_mission_id': api_mission_id})
     print("遠征開始！")
 
+# master取得用 for debug
 def fetch_master():
     #ship = client.call('/api_get_master/ship')
     return None
 
+# 補給を行う
 def supply(client):
     ship_ids = []
     master = Master()
@@ -123,11 +125,7 @@ def supply(client):
         print("補給完了:" + str(result['api_data']['api_ship'][0]['api_id']) + " " + str(result['api_data']['api_material']))
         time.sleep(3)
 
-def battle(client, deck_id = '1'):
-
-    # mapinfo_no - maparea_id
-    mapinfo_no = '1'
-    maparea_id = '1'
+def battle(client, deck_id = '1', mapinfo_no = '1', maparea_id = '1'):
 
     if is_full(client):
         destroy_old_ship(client)
@@ -235,22 +233,13 @@ class AutoTool(object):
         #destroy_old_ship(self.client)
         #engage_next_ship(self.client)
         #sys.exit()
+
         while True:
-            sleep_time = 240
+            sleep_time = 300
 
-            battle(self.client)
-            battle(self.client)
-            battle(self.client)
-            battle(self.client)
-            battle(self.client)
+            #battle(self.client)
 
-            battle(self.client)
-            battle(self.client)
-            battle(self.client)
-            battle(self.client)
-            battle(self.client)
-
-            repair(self.client)
+            #repair(self.client)
             supply(self.client)
             mission(self.client, 1, '5')
             mission(self.client, 2, '6')
