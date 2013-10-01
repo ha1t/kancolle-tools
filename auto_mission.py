@@ -84,6 +84,7 @@ def repair(client):
 
     print('dock_no=', dock_no, ' ship=', ship)
 
+# 遠征を行う
 def mission(client, port_number, mission_id):
     deck_port = client.call('/api_get_member/deck_port')
     dai2kantai = deck_port['api_data'][port_number]
@@ -131,6 +132,8 @@ def battle(client, deck_id = '1', mapinfo_no = '1', maparea_id = '1'):
         destroy_old_ship(client)
         if is_full(client):
             print("所持数が限界に到達しました")
+            os.system('nma.sh "艦これ" ERROR "所持数が限界に達しました" 1')
+            sys.exit()
 
     result = client.call('/api_req_map/start',
                          {'api_formation_id': '1', 'api_deck_id': deck_id, 'api_maparea_id': maparea_id, 'api_mapinfo_no': mapinfo_no})
@@ -159,7 +162,7 @@ def battle(client, deck_id = '1', mapinfo_no = '1', maparea_id = '1'):
 
     if result['api_data']['api_get_ship_exp'][1] not in [108, 90]:
         print('異常発生。巡回を停止します')
-        os.system('nma.sh "艦これ" auto ' + time.strftime("%H-%M-%S"))
+        os.system('nma.sh "艦これ" ERROR "想定取得経験値を下回りました" 1')
         sys.exit()
 
 def powerup(client, ship_id, id_items):
@@ -230,6 +233,7 @@ class AutoTool(object):
         #                         {'api_sort_order': 2, 'api_sort_key': 1})
 
     def crawl(self):
+
         #destroy_old_ship(self.client)
         #engage_next_ship(self.client)
         #sys.exit()
@@ -239,7 +243,7 @@ class AutoTool(object):
 
             #battle(self.client)
 
-            #repair(self.client)
+            repair(self.client)
             supply(self.client)
             mission(self.client, 1, '5')
             mission(self.client, 2, '6')
