@@ -1,6 +1,7 @@
 # coding: utf-8
 from __future__ import print_function
 
+import time
 import json
 import requests
 
@@ -8,6 +9,7 @@ class Client(object):
     #prefix = 'http://203.104.105.167/kcsapi'
     prefix = 'http://203.104.248.135/kcsapi'
     version = '1.4.2'
+    wait_time = 1
 
     def __init__(self, token):
         self.session = requests.session()
@@ -18,6 +20,7 @@ class Client(object):
         self.base_data = {'api_verno': 1, 'api_token': token}
 
     def call(self, path, data=None):
+        time.sleep(self.wait_time)
         if data is None:
             data = {}
         data.update(self.base_data)
