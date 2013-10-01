@@ -16,6 +16,7 @@ class Master(object):
     def __init__(self):
         fp = open('master_ship.txt')
         text = fp.read()
+        fp.close()
         self.master = eval(text)
 
     def get_ship(self, ship_id):
