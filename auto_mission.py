@@ -84,12 +84,15 @@ def repair(client):
 
     print('dock_no=', dock_no, ' ship=', ship)
 
-# 遠征を行う
+# 遠征の出撃、帰投管理を行う
 def mission(client, target = {}):
+
     deck_port = client.call('/api_get_member/deck_port')
 
     for port_number, mission_id in target.items():
+
         kantai = deck_port['api_data'][port_number]
+
         if kantai['api_mission'][2] == 0:
             mission_start(client, kantai['api_id'], mission_id)
         elif kantai['api_mission'][2] < (int(time.time()) * 1000):
