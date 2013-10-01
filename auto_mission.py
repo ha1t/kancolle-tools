@@ -6,6 +6,7 @@ import sys
 import random
 import time
 from client import Client
+from dock import Dock
 
 class NotExpectedResult(Exception):
     pass
@@ -23,33 +24,6 @@ class Master(object):
                 return ship
         raise NotExpectedResult(ship_id)
 
-def find_free_dock(docks):
-    for d in docks:
-        if d['api_state'] == 0:
-            return d['api_id']
-    return None
-
-def find_repairable(member, decks, docks):
-    u"""入渠する艦を選んでその ship を返す."""
-    cant_repair = set()
-
-    # 編成されてる艦を入渠するとバレるのでしない.
-    for deck in decks:
-        cant_repair.update(deck['api_ship'])
-
-    # 修理中の艦ももちろん入渠しない.
-    for dock in docks:
-        cant_repair.add(dock['api_ship_id'])
-
-    for ship in member:
-        if ship['api_nowhp'] >= ship['api_maxhp']:
-            continue
-        ship_id = ship['api_id']
-        if ship_id in cant_repair:
-            continue
-        return ship
-    return None
-
 # 対象の艦が補給対象となるかどうか
 def can_supply(ship, master):
     ship_master = master.get_ship(ship['api_ship_id'])
@@ -60,7 +34,7 @@ def can_supply(ship, master):
     return False
 
 def repair(client):
-    ndock = client.call('/api_get_member/ndock')
+    dock = Dock(client);
     ship2 = client.call('/api_get_member/ship2',
                         {'api_sort_order': 2, 'api_sort_key': 1})
 
@@ -68,12 +42,11 @@ def repair(client):
     member = ship2['api_data']
     member.sort(key=lambda m: m['api_ndock_time'])
 
-    dock_no = find_free_dock(ndock['api_data'])
-    ship = find_repairable(member, ship2['api_data_deck'], ndock['api_data'])
-
+    dock_no = dock.find_free_dock()
     if not dock_no:
         return
 
+    ship = dock.find_repairable(member, ship2['api_data_deck'])
     if ship is None:
         return
 
