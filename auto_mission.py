@@ -14,7 +14,7 @@ class NotExpectedResult(Exception):
 class Master(object):
 
     def __init__(self):
-        fp = open('master.txt')
+        fp = open('master_ship.txt')
         text = fp.read()
         self.master = eval(text)
 
@@ -85,11 +85,6 @@ def mission_start(client, api_deck_id, api_mission_id):
                          {'api_deck_id': api_deck_id, 'api_mission_id': api_mission_id})
     print("遠征開始！")
 
-# master取得用 for debug
-def fetch_master():
-    #ship = client.call('/api_get_master/ship')
-    return None
-
 # 対象の艦が補給対象となるかどうか
 def can_supply(ship, master):
     ship_master = master.get_ship(ship['api_ship_id'])
@@ -155,6 +150,7 @@ def battle(client, deck_id = '1', mapinfo_no = '1', maparea_id = '1'):
         os.system('nma.sh "艦これ" ERROR "想定取得経験値を下回りました" 1')
         sys.exit()
 
+# 近代化改修
 def powerup(client, ship_id, id_items):
     result = client.call('/api_req_kaisou/powerup',
                         {'api_id_items': id_items, 'api_id': ship_id})
@@ -231,7 +227,7 @@ class AutoTool(object):
         while True:
             sleep_time = 300
 
-            #battle(self.client)
+            battle(self.client)
 
             repair(self.client)
             supply(self.client)
