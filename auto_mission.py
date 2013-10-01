@@ -238,7 +238,8 @@ class AutoTool(object):
             mission_sleep_time = mission(self.client, {1: '5', 2: '6', 3: '9'})
 
             if sleep_time > mission_sleep_time:
-                sleep_time = mission_sleep_time
+                # 処理が速すぎると帰投してないみたいなので1秒wait
+                sleep_time = mission_sleep_time + 1
 
             print(str(sleep_time) + '秒スリーブ')
             time.sleep(sleep_time)
