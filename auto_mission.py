@@ -51,6 +51,7 @@ def repair(client):
 # 遠征の出撃、帰投管理を行う
 def mission(client, target = {}):
 
+    # 全艦隊の状況を取得
     deck_port = client.call('/api_get_member/deck_port')
 
     for port_number, mission_id in target.items():
@@ -68,6 +69,7 @@ def mission(client, target = {}):
             nokori = int(str(kantai['api_mission'][2])[0:-3])
             print("遠征中:" + str(port_number) + " / 残り" + str(nokori - int(time.time())) + "秒")
 
+# 遠征の出撃を行う
 def mission_start(client, api_deck_id, api_mission_id):
     result = client.call('/api_req_mission/start',
                          {'api_deck_id': api_deck_id, 'api_mission_id': api_mission_id})
