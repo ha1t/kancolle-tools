@@ -24,15 +24,6 @@ class Master(object):
                 return ship
         raise NotExpectedResult(ship_id)
 
-# 対象の艦が補給対象となるかどうか
-def can_supply(ship, master):
-    ship_master = master.get_ship(ship['api_ship_id'])
-    if ship_master['api_fuel_max'] > ship['api_fuel']:
-        return True
-    if ship_master['api_bull_max'] > ship['api_bull']:
-        return True
-    return False
-
 def repair(client):
     dock = Dock(client);
     ship2 = client.call('/api_get_member/ship2',
@@ -86,6 +77,15 @@ def mission_start(client, api_deck_id, api_mission_id):
 def fetch_master():
     #ship = client.call('/api_get_master/ship')
     return None
+
+# 対象の艦が補給対象となるかどうか
+def can_supply(ship, master):
+    ship_master = master.get_ship(ship['api_ship_id'])
+    if ship_master['api_fuel_max'] > ship['api_fuel']:
+        return True
+    if ship_master['api_bull_max'] > ship['api_bull']:
+        return True
+    return False
 
 # 補給を行う
 def supply(client):
