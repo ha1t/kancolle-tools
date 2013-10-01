@@ -128,9 +128,9 @@ def supply(client):
 
 def battle(client, deck_id = '1', mapinfo_no = '1', maparea_id = '1'):
 
-    if is_full(client):
+    if is_unit_full(client):
         destroy_old_ship(client)
-        if is_full(client):
+        if is_unit_full(client):
             print("所持数が限界に到達しました")
             os.system('nma.sh "艦これ" ERROR "所持数が限界に達しました" 1')
             sys.exit()
@@ -185,7 +185,7 @@ def destroy_old_ship(client):
                 time.sleep(3)
 
 
-def is_full(client):
+def is_unit_full(client):
     result = client.call('/api_get_member/record')
     if result['api_data']['api_ship'][1] == result['api_data']['api_ship'][0]:
         return True
