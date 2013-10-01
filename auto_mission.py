@@ -85,19 +85,21 @@ def repair(client):
     print('dock_no=', dock_no, ' ship=', ship)
 
 # 遠征を行う
-def mission(client, port_number, mission_id):
+def mission(client, target = {}):
     deck_port = client.call('/api_get_member/deck_port')
-    dai2kantai = deck_port['api_data'][port_number]
-    if dai2kantai['api_mission'][2] == 0:
-        mission_start(client, dai2kantai['api_id'], mission_id)
-    elif dai2kantai['api_mission'][2] < (int(time.time()) * 1000):
-        mission_result = client.call('/api_req_mission/result', {'api_deck_id': dai2kantai['api_id']})
-        print("遠征から帰投しました")
-        supply(client)
-        mission_start(client, dai2kantai['api_id'], mission_id)
-    else:
-        nokori = int(str(dai2kantai['api_mission'][2])[0:-3])
-        print("遠征中:" + str(port_number) + " / 残り" + str(nokori - int(time.time())) + "秒")
+
+    for port_number, mission_id in target.items():
+        kantai = deck_port['api_data'][port_number]
+        if kantai['api_mission'][2] == 0:
+            mission_start(client, kantai['api_id'], mission_id)
+        elif kantai['api_mission'][2] < (int(time.time()) * 1000):
+            mission_result = client.call('/api_req_mission/result', {'api_deck_id': kantai['api_id']})
+            print("遠征から帰投しました")
+            supply(client)
+            mission_start(client, kantai['api_id'], mission_id)
+        else:
+            nokori = int(str(kantai['api_mission'][2])[0:-3])
+            print("遠征中:" + str(port_number) + " / 残り" + str(nokori - int(time.time())) + "秒")
 
 def mission_start(client, api_deck_id, api_mission_id):
     result = client.call('/api_req_mission/start',
@@ -245,9 +247,7 @@ class AutoTool(object):
 
             repair(self.client)
             supply(self.client)
-            mission(self.client, 1, '5')
-            mission(self.client, 2, '6')
-            mission(self.client, 3, '9')
+            mission(self.client, {1: '5', 2: '6', 3: '9'})
             time.sleep(sleep_time)
 
 def main():
