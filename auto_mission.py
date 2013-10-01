@@ -54,20 +54,30 @@ def mission(client, target = {}):
     # 全艦隊の状況を取得
     deck_port = client.call('/api_get_member/deck_port')
 
+    minimum_sleep_time = 999999999
+
     for port_number, mission_id in target.items():
 
         kantai = deck_port['api_data'][port_number]
 
         if kantai['api_mission'][2] == 0:
             mission_start(client, kantai['api_id'], mission_id)
-        elif kantai['api_mission'][2] < (int(time.time()) * 1000):
+            continue
+
+        if kantai['api_mission'][2] < (int(time.time()) * 1000):
             mission_result = client.call('/api_req_mission/result', {'api_deck_id': kantai['api_id']})
             print("遠征から帰投しました")
             supply(client)
             mission_start(client, kantai['api_id'], mission_id)
-        else:
-            nokori = int(str(kantai['api_mission'][2])[0:-3])
-            print("遠征中:" + str(port_number) + " / 残り" + str(nokori - int(time.time())) + "秒")
+            continue
+
+        nokori = int(str(kantai['api_mission'][2])[0:-3]) - int(time.time())
+        print("遠征中:" + str(port_number) + " / 残り" + str(nokori) + "秒")
+
+        if minimum_sleep_time > nokori:
+            minimum_sleep_time = nokori
+
+    return minimum_sleep_time
 
 # 遠征の出撃を行う
 def mission_start(client, api_deck_id, api_mission_id):
@@ -225,7 +235,12 @@ class AutoTool(object):
 
             repair(self.client)
             supply(self.client)
-            mission(self.client, {1: '5', 2: '6', 3: '9'})
+            mission_sleep_time = mission(self.client, {1: '5', 2: '6', 3: '9'})
+
+            if sleep_time > mission_sleep_time:
+                sleep_time = mission_sleep_time
+
+            print(str(sleep_time) + '秒スリーブ')
             time.sleep(sleep_time)
 
 def main():
