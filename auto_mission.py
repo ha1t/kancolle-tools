@@ -221,6 +221,10 @@ class AutoTool(object):
 
     def crawl(self):
 
+        #result = self.client.call('/api_get_member/material')
+        #result = self.client.call('/api_auth_member/logincheck')
+        #print(result)
+
         #destroy_old_ship(self.client)
         #engage_next_ship(self.client)
         #sys.exit()
@@ -228,9 +232,13 @@ class AutoTool(object):
         while True:
             sleep_time = 300
 
-            battle(self.client)
+            #result = self.client.call('/api_auth_member/logincheck')
+            #time.sleep(5)
 
-            repair(self.client)
+            battle(self.client)
+            continue
+
+            #repair(self.client)
             supply(self.client)
             mission_sleep_time = mission(self.client, {1: '5', 2: '6', 3: '9'})
 
