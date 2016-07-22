@@ -270,27 +270,8 @@ class AutoTool(object):
         self.master = Master()
 
         print('initialize...')
-        #self.ship2 = client.call('/api_get_member/ship2',
-        #                         {'api_sort_order': 2, 'api_sort_key': 1})
 
     def crawl(self):
-
-        #battle(self.client, 1, 3, 2)
-        #ndock = self.client.call('/api_get_member/deck_port')['api_data'][0]
-        #pprint(ndock)
-
-        #result = self.client.call('/api_auth_member/logincheck')
-
-        #result = self.client.call('/api_get_member/practice')
-        #result = self.client.call('/api_req_member/getothersdeck')
-
-        #result = self.client.call('/api_get_member/material')
-        #result = self.client.call('/api_auth_member/logincheck')
-        #print(result)
-
-        #destroy_old_ship(self.client)
-        #engage_next_ship(self.client)
-        #sys.exit()
 
         while True:
             sleep_time = 300
@@ -301,7 +282,7 @@ class AutoTool(object):
                 print('login check')
                 time.sleep(5)
 
-            #battle(self.client, 1, 1, 1)
+            battle(self.client, 1, 1, 1)
 
             # 潜水艦要
             #battle(self.client, 1, 2, 3)
@@ -309,7 +290,7 @@ class AutoTool(object):
             #battle(self.client, 1, 3, 2)
             #battle(self.client, 1, 2, 4)
             #sys.exit()
-            #continue
+            continue
 
             repair(self.client)
             supply(self.client)
